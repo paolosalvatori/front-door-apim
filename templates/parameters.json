@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.1",
+  "parameters": {
+    "location": {
+      "value": "West Europe"
+    },
+    "workspaceName": {
+      "value": "AfdApimSampleLogAnalytics"
+    },
+    "workspaceSku": {
+      "value": "Standard"
+    },
+    "virtualNetwork": {
+      "value": {
+				"name": "AfdApimSampleVnet",
+				"addressPrefixes": ["10.0.0.0/16"],
+				"subnets": [
+          {
+						"name": "ApiManagementSubnet",
+            "addressPrefix": "10.0.0.0/24",
+            "nsg": "AfdApimSampleNsg"
+					}
+				]
+			}
+    },
+    "appInsightsName": {
+      "value": "AfdApimSampleAppInsights"
+    },
+    "apimServiceName": {
+      "value": "AfdApimSampleApim"
+    },
+    "apimPublisherEmail": {
+      "value": "admin@contoso.com"
+    },
+    "apimPublisherName": {
+      "value": "contoso.com"
+    },
+    "apimSku": {
+      "value": "Developer"
+    },
+    "apimCapacity": {
+      "value": 1
+    },
+    "afdName": {
+      "value": "AfdApimSampleAfd"
+    },
+    "afdFrontendEndpoint": {
+      "value": {
+        "name": "MainFrontendEndpoint",
+        "sessionAffinityEnabledState": "Disabled",
+        "sessionAffinityTtlSeconds": 0
+      }
+    },
+    "afdBackendPool": {
+      "value": {
+        "name": "ApimBackendPool",
+        "loadBalancerName": "ApimLoadBalancer"
+      }
+    },
+    "afdRoutingRule": {
+      "value": {
+        "name": "ApimRoutingRule",
+        "acceptedProtocols": [
+          "Http",
+          "Https"
+        ],
+        "patternsToMatch": [
+          "/*"
+        ],
+        "customForwardingPath": "/"
+      }
+    },
+    "afdHealthProbeSettings": {
+      "value": {
+        "name": "ApimHealthProbeSettings",
+        "intervalInSeconds": 30,
+        "path": "/status-0123456789abcdef",
+        "protocol": "Https"
+      }
+    }
+  }
+}

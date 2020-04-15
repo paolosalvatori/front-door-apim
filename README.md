@@ -7,6 +7,25 @@ author: paolosalvatori
 
 This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview) as global load balancer in front of [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts).
 
+The ARM template included in this project deploys a virtual network with a single subnet. The API Management is deployed in a separate subnet of the same virtual network and is configured to use the external access type for resources. For more information, see [How to use Azure API Management with virtual networks](https://docs.microsoft.com/en-us/azure/api-management/api-management-using-with-vnet). The ARM template creates two APIs:
+
+- Mock API: this API exposes a HTTP GET method that makes use of the [mock-response](https://docs.microsoft.com/en-us/azure/api-management/api-management-advanced-policies#mock-response) policy to return a mocked response directly to the caller. For more information, see [Mock API responses](https://docs.microsoft.com/en-us/azure/api-management/mock-api-responses).
+- Postman Echo API: this API exposes a HTTP GET method that in turn calls the GET Request method exposed by the Postman Echo. This is service that developers can use to test REST clients and make sample API calls. It provides endpoints for GET, POST, PUT, various auth mechanisms and other utility endpoints. The documentation for the endpoints as well as example responses can be found [here](https://postman-echo.com).
+
+Both APIs:
+
+- Are configured to use the same product called Custom.
+- Require specifying the subscription key in the query string or in the header when invoking a method.
+- Make use of an logger to trace requests, errors and metrics to an Application Insights resource.
+
+A Network Security Groups (NSG) is used to control inbound and outbound traffic for the subnet hosting API Management. Inbound and outbound rules are defined to guarantee the proper ingress and egress access to the resources contained in that subnet. Azure Front Door is configured as follows:
+
+- The Backend Pool contains a single backend that is configured to use the public hostname used by the API Management service.
+- A custom probe is defined in the Backend Pool for the API Management service domain endpoint. The custom probe is configured to use the path /status-0123456789abcdef which is the default health endpoint hosted on all the API Management services.
+- Routing Rule: this rule is configured to send all the incoming traffic to the above Backend Pool.
+
+A global WAF rule can be configured on Azure Front Door to protect the API Management from malicious attacks. Azure Front Door and API Management are configured to collect diagnostics logs and metrics in a Log Analytics workspace deployed by the ARM template.
+
 ## Architecture ##
 
 The following picture shows the architecture and network topology of the sample.
@@ -45,4 +64,59 @@ Azure Front Door is a global HTTP\HTTPS load balancer that works at layer 7 prov
 
 For more information, see [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview)
 
+## Deployment ##
 
+You can use the template.json ARM template and parameters.json file included in this repository to deploy the sample. Make sure to edit the parameters.json file to customize the installation. You can also use the deploy.sh Bash script under the scripts folder to deploy the ARM template. The following figure shows the resources deployed by the ARM template in the target resource group.
+
+![Resource Group](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/resourcegroup.png)
+
+## Testing ##
+You can the Azure Portal to verify that the resources have been successfully deployed in your Azure subscription. In particular, click the API Management resource and check if the both the Mock API and Postman Echo API have been successfully deployed as shown in the following figure.
+
+![Postman Echo API](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/postmanechoapi.png)
+
+You can use the Azure Portal to test the methods exposed by both APIs. As shown in the following figure, you can select an API, click the Test in the upper part of the right panel, select an operation and then click the Send button to call the method.
+
+![Test Method](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/testmethod.png)
+
+If you want to call the API using a command-line tool like [curl](https://curl.haxx.se/) or using a tool like [Postman](https://www.postman.com/) you need to retrieve the subscription key of the Custom product used by both APIs. As shown in the following figure, you can select the Custom product, Select Subscriptions in the left panel, right click the subscription key, click the show/hide key context menu item and copy the primary key.
+
+![Get Subscription Key](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/getsubscriptionkey.png)
+
+If you want to invoke the GET method exposed by the Postman Echo API via Azure Front Door, make sure to use the following URL.
+
+```batch
+https://front-door-name.azurefd.net/postman-echo/get?color=red&vehicle=car&subscription-key=apim-subscription-key
+```
+
+You can use [Apache JMeter](https://jmeter.apache.org/) to create a load test for the Postman Echo API, or use your favorite tool for load testing to generate traffic against the GET method. While running a load test against the API, you can use [Application Insights Live Metrics Stream](https://docs.microsoft.com/en-us/azure/azure-monitor/app/live-stream) to see incoming and outgoint requests, as shown in the following picture.
+
+![Live Metrics Stream](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/livemetricsstream.png)
+
+When the test is finished, you can also run Kusto queries in Application Insights and Log Analytics to get more insights in the actual performance results. For example, the following Kusto query in Application Insights
+
+```kusto
+requests
+| where name == 'GET /postman-echo/get'
+  and timestamp > ago(10m)
+| summarize ["Average Response Time"] = avg(duration) by bin(timestamp, 1s)
+| render timechart
+```
+
+renders the following timechart. 
+
+![Timechart01](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/timechart01.png)
+
+Likewise, the following Kusto query in Log Analytics
+
+```kusto
+requests
+| where name == 'GET /postman-echo/get'
+  and timestamp > ago(10m)
+| summarize ["Average Response Time"] = avg(duration) by bin(timestamp, 1s)
+| render timechart
+```
+
+renders the following timechart.
+
+![Timechart01](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/timechart02.png)

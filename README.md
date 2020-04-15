@@ -93,7 +93,7 @@ You can use [Apache JMeter](https://jmeter.apache.org/) to create a load test fo
 
 ![Live Metrics Stream](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/livemetricsstream.png)
 
-When the test is finished, you can also run Kusto queries in Application Insights and Log Analytics to get more insights in the actual performance results. For example, the following Kusto query in Application Insights
+When the test is finished, you can also run Kusto queries in Application Insights and Log Analytics to get more insights in the actual performance results. For example, the following Kusto query in Application Insights renders a timechart of the requests processed by API Management in the last 20 minutes.
 
 ```kusto
 requests
@@ -102,21 +102,29 @@ requests
 | summarize ["Average Response Time"] = avg(duration) by bin(timestamp, 1s)
 | render timechart
 ```
-
-renders the following timechart. 
 
 ![Timechart01](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/timechart01.png)
 
-Likewise, the following Kusto query in Log Analytics
+Likewise, the following Kusto query in Log Analytics renders a timechart of the requests processed by Front Door and API Management in the last 20 minutes.
 
 ```kusto
-requests
-| where name == 'GET /postman-echo/get'
-  and timestamp > ago(10m)
-| summarize ["Average Response Time"] = avg(duration) by bin(timestamp, 1s)
+let startDatetime = now(-20m);
+let endDatetime = now();
+let interval = 1s;
+AzureDiagnostics
+| where Resource == 'AFDAPIMSAMPLEAFD'
+  and TimeGenerated  between(startDatetime .. endDatetime)
+| extend duration = toreal(timeTaken_s) * 1000, 
+         service = "Front Door", 
+         timestamp = TimeGenerated
+| project service, duration, timestamp
+| union (app("AfdApimSampleAppInsights").requests
+| where name == "GET /postman-echo/get"
+  and timestamp between(startDatetime .. endDatetime)
+| extend service = "APIM"
+| project service, duration, timestamp)
+| summarize ['Average Duration'] = avg(duration) by bin(timestamp, interval), service
 | render timechart
 ```
-
-renders the following timechart.
 
 ![Timechart01](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/timechart02.png)

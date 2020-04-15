@@ -7,6 +7,12 @@ author: paolosalvatori
 
 This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview) as global load balancer in front of [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts).
 
+## Architecture ##
+
+The following picture shows the architecture and network topology of the sample.
+
+![Architecture](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/architecture.png)
+
 The ARM template included in this project deploys a virtual network with a single subnet. The API Management is deployed in a separate subnet of the same virtual network and is configured to use the external access type for resources. For more information, see [How to use Azure API Management with virtual networks](https://docs.microsoft.com/en-us/azure/api-management/api-management-using-with-vnet). The ARM template creates two APIs:
 
 - Mock API: this API exposes a HTTP GET method that makes use of the [mock-response](https://docs.microsoft.com/en-us/azure/api-management/api-management-advanced-policies#mock-response) policy to return a mocked response directly to the caller. For more information, see [Mock API responses](https://docs.microsoft.com/en-us/azure/api-management/mock-api-responses).
@@ -25,12 +31,6 @@ A Network Security Groups (NSG) is used to control inbound and outbound traffic 
 - Routing Rule: this rule is configured to send all the incoming traffic to the above Backend Pool.
 
 A global WAF rule can be configured on Azure Front Door to protect the API Management from malicious attacks. Azure Front Door and API Management are configured to collect diagnostics logs and metrics in a Log Analytics workspace deployed by the ARM template.
-
-## Architecture ##
-
-The following picture shows the architecture and network topology of the sample.
-
-![Architecture](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/architecture.png)
 
 ## Azure API Management ##
 

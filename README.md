@@ -7,6 +7,12 @@ author: paolosalvatori
 
 This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview) as global load balancer in front of [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts).
 
+## Architecture ##
+
+The following picture shows the architecture and network topology of the sample.
+
+![Architecture](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/architecture.png)
+
 ## Azure API Management ##
 
 API Management helps organizations publish APIs to external, partner, and internal developers to unlock the potential of their data and services. Azure API Management provides the following capabilities:
@@ -39,8 +45,4 @@ Azure Front Door is a global HTTP\HTTPS load balancer that works at layer 7 prov
 
 For more information, see [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview)
 
-## Architecture ##
 
-The following picture shows the architecture and network topology of the sample.
-
-![Architecture](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/architecture.png)

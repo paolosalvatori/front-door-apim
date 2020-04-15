@@ -3,7 +3,7 @@ services: azure-resource-manager, api-management, frontdoor, azure-monitor, virt
 author: paolosalvatori
 ---
 
-# JMeter Distributed Test Harness #
+# Introduction #
 
 This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview) as global load balancer in front of [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts).
 

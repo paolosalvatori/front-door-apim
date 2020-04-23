@@ -36,7 +36,7 @@ You can optionally deploy a Web Access Firewall (WAF) policy and associate it to
 - [Tutorial: Create a Web Application Firewall policy on Azure Front Door using the Azure portal](https://docs.microsoft.com/en-us/azure/web-application-firewall/afds/waf-front-door-create-portal).
 - [Open Web Application Security Project (OWASP)](https://owasp.org/)
 
-Front Door is a modern Content Delivery Network (CDN) and so along with dynamic site acceleration and load balancing, it also supports caching behaviors just like any other CDN. The ARM template allows to configure Front Door to response caching at the edge and dynamic compression. For more information, see [Caching with Azure Front Door](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-caching).
+Front Door is a modern Content Delivery Network (CDN) and so along with dynamic site acceleration and load balancing, it also supports caching behaviors just like any other CDN. The ARM template allows to configure Front Door to response caching at the edge and dynamic compression. If you want to disable caching, just set the value of the cacheConfiguration property to {} in the afdRoutingRule parameter. For more information, see [Caching with Azure Front Door](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-caching).
 
 Azure Front Door and API Management are configured to collect diagnostics logs and metrics in a Log Analytics workspace deployed by the ARM template.
 
@@ -89,7 +89,7 @@ You can use the Azure Portal to test the methods exposed by both APIs. As shown 
 
 If you want to call the API using a command-line tool like [curl](https://curl.haxx.se/) or using a tool like [Postman](https://www.postman.com/) you need to retrieve the subscription key of the Custom product used by both APIs. As shown in the following figure, you can select the Custom product, Select Subscriptions in the left panel, right click the subscription key, click the show/hide key context menu item and copy the primary key.
 
-![Get Subscription Key](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/getsubscriptionkey.png)
+![Get Subscription Key](https://raw.githubusercontent.com/paolosalvatori/front-door-apim/master/images/GetSubscriptionKey.png)
 
 If you want to invoke the GET method exposed by the Postman Echo API via Azure Front Door, make sure to use the following URL.
 

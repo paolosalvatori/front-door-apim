@@ -6,8 +6,8 @@ location="WestEurope"
 deploy=1
 
 # ARM template and parameters files
-template="../templates/template.json"
-parameters="../templates/parameters.json"
+template="../templates/azuredeploy.json"
+parameters="../templates/azuredeploy.parameters.json"
 
 # SubscriptionId of the current subscription
 subscriptionId=$(az account show --query id --output tsv)

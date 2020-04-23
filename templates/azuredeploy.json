@@ -9,13 +9,6 @@
         "description": "Location for the resources."
       }
     },
-    "workspaceName": {
-      "type": "string",
-      "defaultValue": "AfdApimSampleLogAnalytics",
-      "metadata": {
-        "description": "Name of the Log Analytics workspace"
-      }
-    },
     "virtualNetwork": {
       "type": "object",
       "defaultValue": {
@@ -33,6 +26,13 @@
       },
       "metadata": {
         "description": "Virtual Network configuration."
+      }
+    },
+    "workspaceName": {
+      "type": "string",
+      "defaultValue": "AfdApimSampleLogAnalytics",
+      "metadata": {
+        "description": "Name of the Log Analytics workspace"
       }
     },
     "workspaceSku": {
@@ -165,6 +165,31 @@
       "metadata": {
         "description": "This parameter contains the name and properties of the health probe settings."
       }
+    },
+    "deployWaf": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Specifies whether to deploy a global WAF policy in Front Door."
+      }
+    },
+    "wafPolicyName": {
+      "type": "string",
+      "defaultValue": "AfdApimSampleWaf",
+      "metadata": {
+        "description": "The name of the WAF policy"
+      }
+    },
+    "wafMode": {
+      "type": "string",
+      "allowedValues": [
+        "Detection",
+        "Prevention"
+      ],
+      "defaultValue": "Detection",
+      "metadata": {
+        "description": "Describes if it is in detection mode or prevention mode at policy level."
+      }
     }
   },
   "variables": {
@@ -177,10 +202,11 @@
     "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
     "loggerId": "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apimServiceName'), parameters('appInsightsName'))]",
     "afdId": "[resourceId('Microsoft.Network/frontdoors', parameters('afdName'))]",
-    "afdBackendPoolId": "[concat(variables('afdId'), '/backendPools/', parameters('AfdBackendPool').name)]",
-    "afdHealthProbeSettingsId": "[concat(variables('afdId'), '/healthProbeSettings/', parameters('AfdHealthProbeSettings').name)]",
-    "afdLoadBalancerId": "[concat(variables('afdId'), '/loadBalancingSettings/', parameters('AfdBackendPool').loadBalancerName)]",
-    "afdFrontedEndpointId": "[concat(variables('afdId'), '/frontendEndpoints/', parameters('afdFrontendEndpoint').name)]"
+    "afdBackendPoolId": "[concat(variables('afdId'), '/backendPools/', parameters('afdBackendPool').name)]",
+    "afdHealthProbeSettingsId": "[concat(variables('afdId'), '/healthProbeSettings/', parameters('afdHealthProbeSettings').name)]",
+    "afdLoadBalancerId": "[concat(variables('afdId'), '/loadBalancingSettings/', parameters('afdBackendPool').loadBalancerName)]",
+    "afdFrontedEndpointId": "[concat(variables('afdId'), '/frontendEndpoints/', parameters('afdFrontendEndpoint').name)]",
+    "wafPolicyId": "[resourceId('Microsoft.Network/FrontDoorWebApplicationFirewallPolicies', parameters('wafPolicyName'))]"
   },
   "resources": [
     {
@@ -844,10 +870,34 @@
       }
     },
     {
+      "condition": "[parameters('deployWaf')]",
+      "apiVersion": "2019-03-01",
+      "type": "Microsoft.Network/FrontDoorWebApplicationFirewallPolicies",
+      "name": "[parameters('wafPolicyName')]",
+      "location": "global",
+      "properties": {
+        "policySettings": {
+          "mode": "[parameters('wafMode')]",
+          "enabledState": "Enabled"
+        },
+        "managedRules": {
+          "managedRuleSets": [
+            {
+              "ruleSetType": "DefaultRuleSet",
+              "ruleSetVersion": "1.0"
+            }
+          ]
+        }
+      }
+    },
+    {
       "type": "Microsoft.Network/frontdoors",
       "apiVersion": "2019-05-01",
       "name": "[parameters('afdName')]",
       "location": "Global",
+      "dependsOn": [
+        "[variables('wafPolicyId')]"
+      ],
       "properties": {
         "backendPoolsSettings": {
           "enforceCertificateNameCheck": "[parameters('afdEnforceCertificateNameCheck')]",
@@ -857,7 +907,7 @@
         "resourceState": "Enabled",
         "backendPools": [
           {
-            "name": "[parameters('AfdBackendPool').name]",
+            "name": "[parameters('afdBackendPool').name]",
             "properties": {
               "backends": [
                 {
@@ -880,11 +930,11 @@
         ],
         "healthProbeSettings": [
           {
-            "name": "[parameters('AfdHealthProbeSettings').name]",
+            "name": "[parameters('afdHealthProbeSettings').name]",
             "properties": {
-              "intervalInSeconds": "[parameters('AfdHealthProbeSettings').intervalInSeconds]",
-              "path": "[parameters('AfdHealthProbeSettings').path]",
-              "protocol": "[parameters('AfdHealthProbeSettings').protocol]"
+              "intervalInSeconds": "[parameters('afdHealthProbeSettings').intervalInSeconds]",
+              "path": "[parameters('afdHealthProbeSettings').path]",
+              "protocol": "[parameters('afdHealthProbeSettings').protocol]"
             }
           }
         ],
@@ -895,7 +945,10 @@
               "hostName": "[concat(toLower(parameters('afdName')), '.azurefd.net')]",
               "sessionAffinityEnabledState": "[parameters('afdFrontendEndpoint').sessionAffinityEnabledState]",
               "sessionAffinityTtlSeconds": "[parameters('afdFrontendEndpoint').sessionAffinityTtlSeconds]",
-              "resourceState": "Enabled"
+              "resourceState": "Enabled",
+              "webApplicationFirewallPolicyLink": {
+                "id": "[if(parameters('deployWaf'), variables('wafPolicyId'), json('null'))]"
+              }
             }
           }
         ],
@@ -911,15 +964,15 @@
         ],
         "routingRules": [
           {
-            "name": "[parameters('AfdRoutingRule').name]",
+            "name": "[parameters('afdRoutingRule').name]",
             "properties": {
               "frontendEndpoints": [
                 {
                   "id": "[variables('afdFrontedEndpointId')]"
                 }
               ],
-              "acceptedProtocols": "[parameters('AfdRoutingRule').acceptedProtocols]",
-              "patternsToMatch": "[parameters('AfdRoutingRule').patternsToMatch]",
+              "acceptedProtocols": "[parameters('afdRoutingRule').acceptedProtocols]",
+              "patternsToMatch": "[parameters('afdRoutingRule').patternsToMatch]",
               "routeConfiguration": {
                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
                 "customForwardingPath": "/",

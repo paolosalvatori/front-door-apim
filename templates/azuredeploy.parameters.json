@@ -78,6 +78,15 @@
         "path": "/status-0123456789abcdef",
         "protocol": "Https"
       }
+    },
+    "deployWaf": {
+      "value": true
+    },
+    "wafPolicyName": {
+      "value": "AfdApimSampleWaf"
+    },
+    "wafMode": {
+      "value": "Detection"
     }
   }
 }

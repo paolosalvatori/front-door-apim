@@ -30,7 +30,7 @@ A Network Security Groups (NSG) is used to control inbound and outbound traffic 
 - A custom probe is defined in the Backend Pool for the API Management service domain endpoint. The custom probe is configured to use the path /status-0123456789abcdef which is the default health endpoint hosted on all the API Management services.
 - Routing Rule: this rule is configured to send all the incoming traffic to the above Backend Pool.
 
-A global WAF rule can be configured on Azure Front Door to protect the API Management from malicious attacks. Azure Front Door and API Management are configured to collect diagnostics logs and metrics in a Log Analytics workspace deployed by the ARM template.
+You can optionally deploy a global WAF rule and associate it to the frontend of Azure Front Door to protect the API Management from malicious attacks just setting the valuue of the deployWaf parameter to true. Azure Front Door and API Management are configured to collect diagnostics logs and metrics in a Log Analytics workspace deployed by the ARM template.
 
 ## Azure API Management ##
 
@@ -42,7 +42,7 @@ API Management helps organizations publish APIs to external, partner, and intern
 - Protect a Web API backend using OAuth 2.0 with Azure Active Directory
 - Secure access to the backend service of an API using certificates
 - Monitoring by sending request and response messages to an Event Hub
-- Monitoring requests via Application Insights 
+- Monitoring requests via Application Insights
 - Change request/response messages via policies
 
 For more information, see [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts).

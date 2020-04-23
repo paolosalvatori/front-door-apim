@@ -148,7 +148,12 @@
         "patternsToMatch": [
           "/*"
         ],
-        "customForwardingPath": "/"
+        "customForwardingPath": "/",
+        "forwardingProtocol": "MatchRequest",
+        "cacheConfiguration": {
+          "queryParameterStripDirective": "StripNone",
+          "dynamicCompression": "Enabled"
+        }
       },
       "metadata": {
         "description": "This parameter contains the name and properties of the routing rule."
@@ -976,10 +981,11 @@
               "routeConfiguration": {
                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
                 "customForwardingPath": "/",
-                "forwardingProtocol": "MatchRequest",
+                "forwardingProtocol": "[parameters('afdRoutingRule').forwardingProtocol]",
                 "backendPool": {
                   "id": "[variables('afdBackendPoolId')]"
-                }
+                },
+                "cacheConfiguration": "[parameters('afdRoutingRule').cacheConfiguration]"
               }
             }
           }

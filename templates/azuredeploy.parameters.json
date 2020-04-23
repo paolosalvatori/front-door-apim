@@ -68,7 +68,12 @@
         "patternsToMatch": [
           "/*"
         ],
-        "customForwardingPath": "/"
+        "customForwardingPath": "/",
+        "forwardingProtocol": "MatchRequest",
+        "cacheConfiguration": {
+          "queryParameterStripDirective": "StripNone",
+          "dynamicCompression": "Enabled"
+        }
       }
     },
     "afdHealthProbeSettings": {

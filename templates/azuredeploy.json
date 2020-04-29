@@ -195,6 +195,13 @@
       "metadata": {
         "description": "Describes if it is in detection mode or prevention mode at policy level."
       }
+    },
+    "allowTrafficOnlyFromFrontDoor": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether to allow traffic to API Management public endpoints only from Front Door."
+      }
     }
   },
   "variables": {
@@ -240,7 +247,7 @@
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "80",
-              "sourceAddressPrefix": "Internet",
+              "sourceAddressPrefix": "[if(parameters('allowTrafficOnlyFromFrontDoor'), 'AzureFrontDoor.Backend', 'Internet')]",
               "destinationAddressPrefix": "VirtualNetwork",
               "access": "Allow",
               "priority": 100,
@@ -253,7 +260,7 @@
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "443",
-              "sourceAddressPrefix": "Internet",
+              "sourceAddressPrefix": "[if(parameters('allowTrafficOnlyFromFrontDoor'), 'AzureFrontDoor.Backend', 'Internet')]",
               "destinationAddressPrefix": "VirtualNetwork",
               "access": "Allow",
               "priority": 110,

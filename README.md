@@ -5,7 +5,11 @@ author: paolosalvatori
 
 # Introduction #
 
-This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview) as global load balancer in front of [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts).
+This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview) as a global load balancer in front of [Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts) to get the following advantages:
+
+- Dynamic request acceleration allows to decrease the latency and increase the throughput of backend APIs.
+- Thw use of WAF policy at the edge provides API security against DDoS attacks and malicious users without sacrificing on performance.
+- Response caching allows to drammatically improve performance of GET methods.
 
 ## Architecture ##
 
@@ -38,6 +42,13 @@ You can optionally deploy a Web Access Firewall (WAF) policy and associate it to
 
 Front Door is a modern Content Delivery Network (CDN) and so along with dynamic site acceleration and load balancing, it also supports caching behaviors just like any other CDN. The ARM template allows to configure Front Door to response caching at the edge and dynamic compression. If you want to disable caching, just set the value of the cacheConfiguration property to {} in the afdRoutingRule parameter. For more information, see [Caching with Azure Front Door](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-caching).
 
+When API Management is deployed in a virtual network and configured to use the external access type as explained at [How to use Azure API Management with virtual networks](https://docs.microsoft.com/en-us/azure/api-management/api-management-using-with-vnet), the API Gateway and Developer Portal are accessible from the public internet via an external load balancer and the API Gateway can access resources within the virtual network. If you want to force client applications to invoke the API Gateway through Azure Front Door, you can proceed as follows:
+
+- You can set an inbound rule in the [Network Security Group](https://docs.microsoft.com/en-us/azure/virtual-network/security-overview) (NSG) associated with the subnet hosting API Management to accept inbound traffic on HTTP/HTTPS ports only from Front Door using the AzureFrontDoor.Backend service tag. This way the public endpoints exposed by API Management, including the endpoints exposed by the API Gateway and developer portal, will accept calls only via Azure Front Door. For more information, see [How do I lock down the access to my backend to only Azure Front Door?](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-faq).
+- If you want to provide access to the API Management developer portal to users, you can create an additional inbound rule to provide access to one or more ranges of IP addresses, or you can deploy the self-hosted developer portal, on-premises or in the cloud (e.g. a VM on Azure), and create an inbound rule in the NSG associated to the subnet hosting API Management to accept inbound traffic on HTTP/HTTPS ports fromt the IP address of the physical server or virtual machine hosting the self-hosted developer portal.
+
+The ARM template provides a boolean parameter called allowTrafficOnlyFromFrontDoor that specifies whether the inbound traffic on ports 80 (HTTP) and 443 (HTTPS) is allowed only from Azure Front Door.
+
 Azure Front Door and API Management are configured to collect diagnostics logs and metrics in a Log Analytics workspace deployed by the ARM template.
 
 ## Azure API Management ##
@@ -65,7 +76,7 @@ Azure Front Door is a global HTTP\HTTPS load balancer that works at layer 7 prov
 - Path based routing powers global microservice applications with independent routing all under a single global domain.
 - A single pane of glass to monitor and gain insight into user’s traffic and distributed backend service’s health.
 - Health Probes: in order to determine the health of each backend, each Front Door environment periodically sends a synthetic HTTP/HTTPS request to each of your configured backends. Front Door then uses responses from these probes to determine the "best" backends to which it should route real client requests.
-- WAF at the edge provides application security against DDoS attacks or malicious users at the edge providing protection at scale without sacrificing on performance.
+- WAF at the edge provides application security against DDoS attacks or malicious users providing protection at scale without sacrificing on performance.
 - Caching: Azure Front Door delivers large files without a cap on file size. Azure Front Door is able to cache and deliver large files in chunks of 8 MB. In addition, Azure Front Door can dynamically compress content on the edge, resulting in a smaller and faster response to your clients.
 - URL Rewrite allows to copy any part of the incoming path that matches to a wildcard path to the forwarded path.
 - IPv6, custom SSL certificates, rate limiting, geo-filtering, etc.

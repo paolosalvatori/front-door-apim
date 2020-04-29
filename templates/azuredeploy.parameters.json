@@ -92,6 +92,9 @@
     },
     "wafMode": {
       "value": "Detection"
+    },
+    "allowTrafficOnlyFromFrontDoor": {
+      "value": false
     }
   }
 }

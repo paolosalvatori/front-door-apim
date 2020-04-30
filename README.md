@@ -11,7 +11,7 @@ This sample demonstrates how to use [Azure Front Door](https://docs.microsoft.co
 - The use of a WAF policy at the edge provides API security against DDoS attacks and malicious users.
 - Response caching allows to drammatically improve performance of GET methods.
 
-If you are searching for a step-by-step sample that makes use of the Azure portal to create resources, look at [Basic walkthrough setup of Azure Front Door with API Management](http://mikaelsand.se/2020/04/basic-walkthru-setup-of-azure-front-door-with-apim/).
+If you are searching for a basic step-by-step tutorial that makes use of the Azure portal to create resources rather than ARM templates, look at [Basic walkthrough setup of Azure Front Door with API Management](http://mikaelsand.se/2020/04/basic-walkthru-setup-of-azure-front-door-with-apim/).
 
 ## Architecture ##
 

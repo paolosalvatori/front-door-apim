@@ -38,7 +38,7 @@ A Network Security Groups (NSG) is used to control inbound and outbound traffic 
 
 You can optionally deploy a Web Access Firewall (WAF) policy and associate it to the frontend of Azure Front Door to protect the API Management from malicious attacks just setting the value of the deployWaf parameter to true. The WAF policy deployed by the ARM template is configured to use the OWASP default rule set. For more information, see:
 
-- [Azure Web Application Firewall on Azure Front Door](https://docs.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview) 
+- [Azure Web Application Firewall on Azure Front Door](https://docs.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview)
 - [Tutorial: Create a Web Application Firewall policy on Azure Front Door using the Azure portal](https://docs.microsoft.com/en-us/azure/web-application-firewall/afds/waf-front-door-create-portal).
 - [Open Web Application Security Project (OWASP)](https://owasp.org/)
 

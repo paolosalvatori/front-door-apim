@@ -6,29 +6,29 @@
       "value": "West Europe"
     },
     "workspaceName": {
-      "value": "AfdApimSampleLogAnalytics"
+      "value": "FrontDoorApimDemoLogAnalytics"
     },
     "workspaceSku": {
       "value": "Standard"
     },
     "virtualNetwork": {
       "value": {
-				"name": "AfdApimSampleVnet",
+				"name": "FrontDoorApimDemoVnet",
 				"addressPrefixes": ["10.0.0.0/16"],
 				"subnets": [
           {
 						"name": "ApiManagementSubnet",
             "addressPrefix": "10.0.0.0/24",
-            "nsg": "AfdApimSampleNsg"
+            "nsg": "FrontDoorApimDemoNsg"
 					}
 				]
 			}
     },
     "appInsightsName": {
-      "value": "AfdApimSampleAppInsights"
+      "value": "FrontDoorApimDemoAppInsights"
     },
     "apimServiceName": {
-      "value": "AfdApimSampleApim"
+      "value": "FrontDoorApimDemoApim"
     },
     "apimPublisherEmail": {
       "value": "admin@contoso.com"
@@ -43,7 +43,7 @@
       "value": 1
     },
     "frontDoorName": {
-      "value": "AfdApimSampleAfd"
+      "value": "FrontDoorApimDemoAfd"
     },
     "frontDoorFrontendEndpoint": {
       "value": {
@@ -88,7 +88,7 @@
       "value": true
     },
     "wafPolicyName": {
-      "value": "AfdApimSampleWaf"
+      "value": "FrontDoorApimDemoWaf"
     },
     "wafMode": {
       "value": "Detection"

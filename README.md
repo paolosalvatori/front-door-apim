@@ -92,6 +92,7 @@ You can use the template.json ARM template and parameters.json file included in 
 ![Resource Group](images/ResourceGroup.png)
 
 ## Testing ##
+
 You can the Azure Portal to verify that the resources have been successfully deployed in your Azure subscription. In particular, click the API Management resource and check if the both the Mock API and Postman Echo API have been successfully deployed as shown in the following figure.
 
 ![Postman Echo API](images/PostmanEchoAPI.png)
@@ -135,8 +136,8 @@ let interval = 1s;
 AzureDiagnostics
 | where Resource == 'AFDAPIMSAMPLEAFD'
   and TimeGenerated  between(startDatetime .. endDatetime)
-| extend duration = toreal(timeTaken_s) * 1000, 
-         service = "Front Door", 
+| extend duration = toreal(timeTaken_s) * 1000,
+         service = "Front Door",
          timestamp = TimeGenerated
 | project service, duration, timestamp
 | union (app("AfdApimSampleAppInsights").requests

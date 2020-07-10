@@ -95,11 +95,6 @@ deployTemplate() {
             --parameters $arguments 1>/dev/null
     fi
 
-     az deployment group create \
-        --resource-group $resourceGroup \
-        --template-file $template \
-        --parameters $parameters 1>/dev/null
-
     if [[ $? == 0 ]]; then
         echo "["$template"] ARM template successfully provisioned"
     else

@@ -106,7 +106,13 @@ deployTemplate() {
 # Create Resource Group
 createResourceGroup "$resourceGroupName"
 
-# Deploy JMeter Test Harness
+# Validate ARM Template for Azure Front Door - API Management - Log Analytics Demo
+validateTemplate \
+    "$resourceGroupName" \
+    "$template" \
+    "$parameters"
+
+# Deploy ARM Temaplate for Azure Front Door - API Management - Log Analytics Demo
 deployTemplate \
     "$resourceGroupName" \
     "$template" \
